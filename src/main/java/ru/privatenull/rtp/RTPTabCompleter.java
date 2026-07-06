@@ -24,11 +24,11 @@ public class RTPTabCompleter implements TabCompleter {
             if (sender.hasPermission("pnrtp.near")) {
                 completions.add("near");
             }
+            if (sender.hasPermission("pnrtp.default")) {
+                completions.add("default");
+            }
             if (sender.hasPermission("pnrtp.far")) {
                 completions.add("far");
-            }
-            if (sender.hasPermission("pnrtp.long")) {
-                completions.add("long");
             }
         }
 

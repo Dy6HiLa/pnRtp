@@ -70,6 +70,15 @@ public class RTPManager {
     public void teleportPlayer(Player player, String mode) {
         World world = player.getWorld();
 
+        // Проверяем разрешённые миры
+        java.util.List<String> allowedWorlds = plugin.getConfig().getStringList("allowed-worlds");
+        if (allowedWorlds != null && !allowedWorlds.isEmpty()) {
+            if (!allowedWorlds.contains(world.getName())) {
+                plugin.sendMessage(player, "invalid-world");
+                return;
+            }
+        }
+
         // Проверяем worldborder
         if (plugin.isWorldBorderCheck()) {
             if (world.getWorldBorder() == null) {

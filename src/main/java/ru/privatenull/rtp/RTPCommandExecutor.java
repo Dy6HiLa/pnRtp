@@ -54,10 +54,10 @@ public class RTPCommandExecutor implements CommandExecutor {
             return true;
         }
 
-        String mode = "far"; // default mode
+        String mode = "default";
         if (args.length >= 1) {
             String arg = args[0].toLowerCase();
-            if (arg.equals("near") || arg.equals("far") || arg.equals("long")) {
+            if (arg.equals("near") || arg.equals("far") || arg.equals("default")) {
                 mode = arg;
             } else {
                 plugin.sendMessage(player, "usage");

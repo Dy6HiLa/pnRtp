@@ -1,16 +1,26 @@
 # Настройки pnrtp
+# Список разрешённых миров для RTP (если пустой - работает во всех мирах)
+allowed-worlds:
+  - "world"
+  # - "world_nether"
+  # - "world_the_end"
+
 # Настройки режимов (радиус и кулдаун в секундах)
+# near   - телепортация рядом с игроком
+# default - обычная телепортация
+# far    - далёкая телепортация
 # Кулдаун общий: после использования любого режима устанавливается кд для ВСЕХ режимов
 modes:
   near:
     radius: 100
     cooldown: 180
-  far:
+  default:
     radius: 1000
-    cooldown: 30
-  long:
-    radius: 3000
     cooldown: 60
+  far:
+    radius: 3000
+    cooldown: 30
+
 worldborder-check: true
 avoid-water: true
 avoid-lava: true
@@ -25,10 +35,10 @@ messages:
   cooldown-reset: "&aКулдаун игрока {player} сброшен!"
   cooldown-reset-target: "&aВаш кулдаун был сброшен администратором!"
   player-not-found: "&cИгрок {player} не найден!"
-  invalid-world: "&cМир не подходит для RTP!"
+  invalid-world: "&cЭтот мир не подходит для RTP!"
   error: "&cПроизошла ошибка при телепортации!"
   no-safe-location: "&cНе удалось найти безопасное место. Попробуйте позже."
-  usage: "&cИспользование: /rtp <near|far|long>"
+  usage: "&cИспользование: /rtp <near|default|far>"
 
 titles:
   enabled: true
@@ -55,3 +65,17 @@ effects:
     sound: ENTITY_PLAYER_LEVELUP
     sound-volume: 0.8
     sound-pitch: 1.5
+
+# ===== Права для LuckPerms (донат-группы) =====
+# Добавьте эти права в ваши группы через LuckPerms:
+#
+# /lp group default permission set pnrtp.default true     <- Бесплатная обычная телепортация
+# /lp group vip permission set pnrtp.near true            <- VIP: телепортация рядом
+# /lp group premium permission set pnrtp.far true         <- Premium: далёкая телепортация
+# /lp group admin permission set pnrtp.bypass true        <- Обход кулдауна
+# /lp group admin permission set pnrtp.admin true         <- Админ: reload, resetcd
+#
+# Пример для нескольких прав сразу:
+# /lp group premium permission set pnrtp.near true
+# /lp group premium permission set pnrtp.default true
+# /lp group premium permission set pnrtp.far true
