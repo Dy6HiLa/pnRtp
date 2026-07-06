@@ -68,20 +68,17 @@ public class RTPManager {
     }
 
     public void teleportPlayer(Player player, String mode) {
-        World world = player.getWorld();
+        String targetWorldName = plugin.getConfig().getString("target-world", "world");
+        World targetWorld = Bukkit.getWorld(targetWorldName);
 
-        // Проверяем разрешённые миры
-        java.util.List<String> allowedWorlds = plugin.getConfig().getStringList("allowed-worlds");
-        if (allowedWorlds != null && !allowedWorlds.isEmpty()) {
-            if (!allowedWorlds.contains(world.getName())) {
-                plugin.sendMessage(player, "invalid-world");
-                return;
-            }
+        if (targetWorld == null) {
+            plugin.sendMessage(player, "invalid-world");
+            return;
         }
 
         // Проверяем worldborder
         if (plugin.isWorldBorderCheck()) {
-            if (world.getWorldBorder() == null) {
+            if (targetWorld.getWorldBorder() == null) {
                 plugin.sendMessage(player, "invalid-world");
                 return;
             }
@@ -96,7 +93,9 @@ public class RTPManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Location safeLocation = findSafeLocation(player.getLocation(), mode);
+                // Если игрок уже в целевом мире, ищем от его текущей позиции, иначе от спавна целевого мира
+                Location origin = player.getWorld().equals(targetWorld) ? player.getLocation() : targetWorld.getSpawnLocation();
+                Location safeLocation = findSafeLocation(origin, mode);
 
                 if (safeLocation == null) {
                     new BukkitRunnable() {
