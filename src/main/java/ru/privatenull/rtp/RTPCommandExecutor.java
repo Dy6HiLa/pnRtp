@@ -47,7 +47,21 @@ public class RTPCommandExecutor implements CommandExecutor {
             return true;
         }
 
-        rtpManager.teleportPlayer(player);
+        String mode = "far"; // default mode
+        if (args.length >= 1) {
+            String arg = args[0].toLowerCase();
+            if (arg.equals("near") || arg.equals("far") || arg.equals("long")) {
+                mode = arg;
+            } else {
+                plugin.sendMessage(player, "usage");
+                return true;
+            }
+        } else {
+            plugin.sendMessage(player, "usage");
+            return true;
+        }
+
+        rtpManager.teleportPlayer(player, mode);
         return true;
     }
 

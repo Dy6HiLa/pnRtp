@@ -14,9 +14,14 @@ public class RTPTabCompleter implements TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
 
-        if (sender instanceof Player && sender.hasPermission("pnrtp.admin")) {
-            if (args.length == 1) {
+        if (args.length == 1) {
+            if (sender instanceof Player && sender.hasPermission("pnrtp.admin")) {
                 completions.add("reload");
+            }
+            if (sender.hasPermission("pnrtp.use")) {
+                completions.add("near");
+                completions.add("far");
+                completions.add("long");
             }
         }
 

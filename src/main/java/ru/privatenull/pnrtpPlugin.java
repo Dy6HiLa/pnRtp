@@ -65,12 +65,24 @@ public final class pnrtpPlugin extends JavaPlugin {
         return message.replace("&", "§");
     }
 
-    public int getRadius() {
-        return getConfig().getInt("radius", 5000);
+    public void sendTitle(org.bukkit.entity.Player player) {
+        if (!getConfig().getBoolean("titles.enabled", true)) return;
+        
+        String up = colorize(getConfig().getString("titles.up", ""));
+        String down = colorize(getConfig().getString("titles.down", ""));
+        int fadeIn = getConfig().getInt("titles.fadeIn", 10);
+        int stay = getConfig().getInt("titles.stay", 40);
+        int fadeOut = getConfig().getInt("titles.fadeOut", 10);
+        
+        player.sendTitle(up, down, fadeIn, stay, fadeOut);
     }
 
-    public int getCooldown() {
-        return getConfig().getInt("cooldown", 30);
+    public int getRadius(String mode) {
+        return getConfig().getInt("modes." + mode + ".radius", 1000);
+    }
+
+    public int getCooldown(String mode) {
+        return getConfig().getInt("modes." + mode + ".cooldown", 30);
     }
 
     public boolean isWorldBorderCheck() {

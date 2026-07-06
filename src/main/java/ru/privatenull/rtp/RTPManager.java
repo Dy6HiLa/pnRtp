@@ -60,13 +60,13 @@ public class RTPManager {
         return Math.max(0, remaining / 1000);
     }
 
-    public void setCooldown(Player player) {
+    public void setCooldown(Player player, String mode) {
         UUID playerId = player.getUniqueId();
-        int cooldownSeconds = plugin.getCooldown();
+        int cooldownSeconds = plugin.getCooldown(mode);
         cooldowns.put(playerId, System.currentTimeMillis() + (cooldownSeconds * 1000L));
     }
 
-    public void teleportPlayer(Player player) {
+    public void teleportPlayer(Player player, String mode) {
         World world = player.getWorld();
 
         // Проверяем worldborder
@@ -83,7 +83,7 @@ public class RTPManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Location safeLocation = findSafeLocation(world);
+                Location safeLocation = findSafeLocation(player.getLocation(), mode);
 
                 if (safeLocation == null) {
                     new BukkitRunnable() {
@@ -96,7 +96,7 @@ public class RTPManager {
                 }
 
                 // Меняем кд
-                setCooldown(player);
+                setCooldown(player, mode);
 
                 // Телепортируем игрока
                 new BukkitRunnable() {
@@ -106,6 +106,7 @@ public class RTPManager {
                         player.teleportAsync(safeLocation).thenAccept(success -> {
                             if (success) {
                                 plugin.sendMessage(player, "teleported");
+                                plugin.sendTitle(player);
                             } else {
                                 plugin.sendMessage(player, "error");
                             }
@@ -116,13 +117,17 @@ public class RTPManager {
         }.runTaskAsynchronously(plugin);
     }
 
-    private Location findSafeLocation(World world) {
-        int radius = plugin.getRadius();
+    private Location findSafeLocation(Location origin, String mode) {
+        int radius = plugin.getRadius(mode);
         int maxAttempts = 1000;
+        World world = origin.getWorld();
 
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
-            double x = (random.nextDouble() * 2 - 1) * radius;
-            double z = (random.nextDouble() * 2 - 1) * radius;
+            double offsetX = (random.nextDouble() * 2 - 1) * radius;
+            double offsetZ = (random.nextDouble() * 2 - 1) * radius;
+
+            double x = origin.getX() + offsetX;
+            double z = origin.getZ() + offsetZ;
 
             Location location = findHighestSafeY(world, x, z);
 
