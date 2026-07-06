@@ -1,0 +1,15 @@
+name: pnrtp
+version: '${version}'
+main: ru.privatenull.pnrtpPlugin
+api-version: '1.21'
+author: privatenull
+commands:
+  rtp:
+    description: Случайная телепортация
+    usage: /rtp
+    permission: pnrtp.use
+permissions:
+  pnrtp.use:
+    default: true
+  pnrtp.admin:
+    default: op

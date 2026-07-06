@@ -1,0 +1,17 @@
+# Настройки pnrtp
+radius: 5000
+cooldown: 30
+worldborder-check: true
+avoid-water: true
+avoid-lava: true
+avoid-trees: true
+safety-check-radius: 5.0
+
+messages:
+  no-permission: "&cУ вас нет прав для использования этого команды!"
+  teleporting: "&eПоиск безопасной локации..."
+  teleported: "&aВы были телепорчены в случайное место!"
+  cooldown-active: "&cПодождите {time} секунд перед следующим использованием!"
+  invalid-world: "&cМир не подходит для RTP!"
+  error: "&cПроизошла ошибка при телепортации!"
+  no-safe-location: "&cНе удалось найти безопасное место. Попробуйте позже."
