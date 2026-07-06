@@ -115,7 +115,9 @@ public class RTPManager {
             Player randomTarget = validTargets.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(validTargets.size()));
             origin = randomTarget.getLocation();
         } else {
-            origin = player.getWorld().equals(targetWorld) ? player.getLocation() : targetWorld.getSpawnLocation();
+            // Для остальных режимов (default, far) всегда ищем от спавна мира, 
+            // чтобы раскидывать игроков по всему миру, а не топтаться на месте
+            origin = targetWorld.getSpawnLocation();
         }
 
         final Location finalOrigin = origin;
