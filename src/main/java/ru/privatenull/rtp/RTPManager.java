@@ -1,6 +1,13 @@
 package ru.privatenull.rtp;
 
-import org.bukkit.*;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.World;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -149,16 +156,20 @@ public class RTPManager {
         try {
             String particleName = plugin.getConfig().getString("effects.start.particle", "PORTAL");
             int count = plugin.getConfig().getInt("effects.start.count", 50);
-            Particle particle = Particle.valueOf(particleName);
-            world.spawnParticle(particle, location.add(0, 1, 0), count, 0.5, 1.0, 0.5, 0.1);
+            Particle particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(particleName.toLowerCase()));
+            if (particle != null) {
+                world.spawnParticle(particle, location.add(0, 1, 0), count, 0.5, 1.0, 0.5, 0.1);
+            }
         } catch (Exception ignored) {}
 
         try {
             String soundName = plugin.getConfig().getString("effects.start.sound", "ENTITY_ENDERMAN_TELEPORT");
             float volume = (float) plugin.getConfig().getDouble("effects.start.sound-volume", 1.0);
             float pitch = (float) plugin.getConfig().getDouble("effects.start.sound-pitch", 1.2);
-            Sound sound = Sound.valueOf(soundName);
-            world.playSound(location, sound, volume, pitch);
+            Sound sound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName.toLowerCase()));
+            if (sound != null) {
+                world.playSound(location, sound, volume, pitch);
+            }
         } catch (Exception ignored) {}
     }
 
@@ -171,16 +182,20 @@ public class RTPManager {
         try {
             String particleName = plugin.getConfig().getString("effects.end.particle", "END_ROD");
             int count = plugin.getConfig().getInt("effects.end.count", 80);
-            Particle particle = Particle.valueOf(particleName);
-            world.spawnParticle(particle, location.add(0, 1, 0), count, 0.5, 1.0, 0.5, 0.05);
+            Particle particle = Registry.PARTICLE_TYPE.get(NamespacedKey.minecraft(particleName.toLowerCase()));
+            if (particle != null) {
+                world.spawnParticle(particle, location.add(0, 1, 0), count, 0.5, 1.0, 0.5, 0.05);
+            }
         } catch (Exception ignored) {}
 
         try {
             String soundName = plugin.getConfig().getString("effects.end.sound", "ENTITY_PLAYER_LEVELUP");
             float volume = (float) plugin.getConfig().getDouble("effects.end.sound-volume", 0.8);
             float pitch = (float) plugin.getConfig().getDouble("effects.end.sound-pitch", 1.5);
-            Sound sound = Sound.valueOf(soundName);
-            world.playSound(location, sound, volume, pitch);
+            Sound sound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName.toLowerCase()));
+            if (sound != null) {
+                world.playSound(location, sound, volume, pitch);
+            }
         } catch (Exception ignored) {}
     }
 
