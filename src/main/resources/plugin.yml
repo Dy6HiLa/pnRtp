@@ -1,4 +1,4 @@
-name: pnrtp
+name: pnRtp
 version: '${version}'
 main: ru.privatenull.pnrtpPlugin
 api-version: '1.21'
