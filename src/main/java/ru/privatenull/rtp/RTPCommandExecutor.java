@@ -1,5 +1,6 @@
 package ru.privatenull.rtp;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -33,6 +34,23 @@ public class RTPCommandExecutor implements CommandExecutor {
             }
             plugin.reloadPlugin();
             player.sendMessage(plugin.colorize("&aКонфигурация перезагружена!"));
+            return true;
+        }
+
+        // Админ команда resetcd <игрок>
+        if (args.length == 2 && args[0].equalsIgnoreCase("resetcd")) {
+            if (!player.hasPermission("pnrtp.admin")) {
+                plugin.sendMessage(player, "no-permission");
+                return true;
+            }
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target == null) {
+                plugin.sendMessage(player, "player-not-found", "{player}", args[1]);
+                return true;
+            }
+            rtpManager.resetCooldown(target);
+            plugin.sendMessage(player, "cooldown-reset", "{player}", target.getName());
+            plugin.sendMessage(target, "cooldown-reset-target");
             return true;
         }
 

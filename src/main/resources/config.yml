@@ -1,5 +1,6 @@
 # Настройки pnrtp
 # Настройки режимов (радиус и кулдаун в секундах)
+# Кулдаун общий: после использования любого режима устанавливается кд для ВСЕХ режимов
 modes:
   near:
     radius: 100
@@ -17,10 +18,13 @@ avoid-trees: true
 safety-check-radius: 5.0
 
 messages:
-  no-permission: "&cУ вас нет прав для использования этого команды!"
+  no-permission: "&cУ вас нет прав для использования этой команды!"
   teleporting: "&eПоиск безопасной локации..."
-  teleported: "&aВы были телепорчены в случайное место!"
+  teleported: "&aВы были телепортированы в случайное место!"
   cooldown-active: "&cПодождите {time} секунд перед следующим использованием!"
+  cooldown-reset: "&aКулдаун игрока {player} сброшен!"
+  cooldown-reset-target: "&aВаш кулдаун был сброшен администратором!"
+  player-not-found: "&cИгрок {player} не найден!"
   invalid-world: "&cМир не подходит для RTP!"
   error: "&cПроизошла ошибка при телепортации!"
   no-safe-location: "&cНе удалось найти безопасное место. Попробуйте позже."
@@ -33,3 +37,21 @@ titles:
   fadeIn: 10
   stay: 40
   fadeOut: 10
+
+# Эффекты при телепортации
+effects:
+  enabled: true
+  # Эффект на старте (где стоял игрок)
+  start:
+    particle: PORTAL
+    count: 50
+    sound: ENTITY_ENDERMAN_TELEPORT
+    sound-volume: 1.0
+    sound-pitch: 1.2
+  # Эффект на финише (куда телепортировался)
+  end:
+    particle: END_ROD
+    count: 80
+    sound: ENTITY_PLAYER_LEVELUP
+    sound-volume: 0.8
+    sound-pitch: 1.5

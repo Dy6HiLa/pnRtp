@@ -1,9 +1,6 @@
 package ru.privatenull.rtp;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -66,6 +63,10 @@ public class RTPManager {
         cooldowns.put(playerId, System.currentTimeMillis() + (cooldownSeconds * 1000L));
     }
 
+    public void resetCooldown(Player player) {
+        cooldowns.remove(player.getUniqueId());
+    }
+
     public void teleportPlayer(Player player, String mode) {
         World world = player.getWorld();
 
@@ -78,6 +79,9 @@ public class RTPManager {
         }
 
         plugin.sendMessage(player, "teleporting");
+
+        // Запоминаем стартовую позицию для эффекта
+        Location startLocation = player.getLocation().clone();
 
         // Асинхронный поиск локации
         new BukkitRunnable() {
@@ -102,11 +106,22 @@ public class RTPManager {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
+                        // Эффект на старте
+                        playStartEffects(startLocation);
+
                         safeLocation.getChunk().load();
                         player.teleportAsync(safeLocation).thenAccept(success -> {
                             if (success) {
                                 plugin.sendMessage(player, "teleported");
                                 plugin.sendTitle(player);
+
+                                // Эффект на финише (с небольшой задержкой)
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        playEndEffects(player.getLocation());
+                                    }
+                                }.runTaskLater(plugin, 3L);
                             } else {
                                 plugin.sendMessage(player, "error");
                             }
@@ -115,6 +130,50 @@ public class RTPManager {
                 }.runTask(plugin);
             }
         }.runTaskAsynchronously(plugin);
+    }
+
+    private void playStartEffects(Location location) {
+        if (!plugin.getConfig().getBoolean("effects.enabled", true)) return;
+
+        World world = location.getWorld();
+        if (world == null) return;
+
+        try {
+            String particleName = plugin.getConfig().getString("effects.start.particle", "PORTAL");
+            int count = plugin.getConfig().getInt("effects.start.count", 50);
+            Particle particle = Particle.valueOf(particleName);
+            world.spawnParticle(particle, location.add(0, 1, 0), count, 0.5, 1.0, 0.5, 0.1);
+        } catch (Exception ignored) {}
+
+        try {
+            String soundName = plugin.getConfig().getString("effects.start.sound", "ENTITY_ENDERMAN_TELEPORT");
+            float volume = (float) plugin.getConfig().getDouble("effects.start.sound-volume", 1.0);
+            float pitch = (float) plugin.getConfig().getDouble("effects.start.sound-pitch", 1.2);
+            Sound sound = Sound.valueOf(soundName);
+            world.playSound(location, sound, volume, pitch);
+        } catch (Exception ignored) {}
+    }
+
+    private void playEndEffects(Location location) {
+        if (!plugin.getConfig().getBoolean("effects.enabled", true)) return;
+
+        World world = location.getWorld();
+        if (world == null) return;
+
+        try {
+            String particleName = plugin.getConfig().getString("effects.end.particle", "END_ROD");
+            int count = plugin.getConfig().getInt("effects.end.count", 80);
+            Particle particle = Particle.valueOf(particleName);
+            world.spawnParticle(particle, location.add(0, 1, 0), count, 0.5, 1.0, 0.5, 0.05);
+        } catch (Exception ignored) {}
+
+        try {
+            String soundName = plugin.getConfig().getString("effects.end.sound", "ENTITY_PLAYER_LEVELUP");
+            float volume = (float) plugin.getConfig().getDouble("effects.end.sound-volume", 0.8);
+            float pitch = (float) plugin.getConfig().getDouble("effects.end.sound-pitch", 1.5);
+            Sound sound = Sound.valueOf(soundName);
+            world.playSound(location, sound, volume, pitch);
+        } catch (Exception ignored) {}
     }
 
     private Location findSafeLocation(Location origin, String mode) {
