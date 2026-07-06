@@ -91,6 +91,35 @@ public class RTPManager {
             }
         }
 
+        // Логика поиска origin
+        Location origin;
+        if (mode.equalsIgnoreCase("near")) {
+            int minPlayers = plugin.getConfig().getInt("modes.near.min-players", 2);
+            if (Bukkit.getOnlinePlayers().size() < minPlayers) {
+                plugin.sendMessage(player, "not-enough-players");
+                return;
+            }
+
+            java.util.List<Player> validTargets = new java.util.ArrayList<>();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (!p.equals(player) && p.getWorld().equals(targetWorld)) {
+                    validTargets.add(p);
+                }
+            }
+
+            if (validTargets.isEmpty()) {
+                plugin.sendMessage(player, "not-enough-players");
+                return;
+            }
+
+            Player randomTarget = validTargets.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(validTargets.size()));
+            origin = randomTarget.getLocation();
+        } else {
+            origin = player.getWorld().equals(targetWorld) ? player.getLocation() : targetWorld.getSpawnLocation();
+        }
+
+        final Location finalOrigin = origin;
+
         plugin.sendMessage(player, "teleporting");
 
         // Запоминаем стартовую позицию для эффекта
@@ -100,9 +129,7 @@ public class RTPManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // Если игрок уже в целевом мире, ищем от его текущей позиции, иначе от спавна целевого мира
-                Location origin = player.getWorld().equals(targetWorld) ? player.getLocation() : targetWorld.getSpawnLocation();
-                Location safeLocation = findSafeLocation(origin, mode);
+                Location safeLocation = findSafeLocation(finalOrigin, mode);
 
                 if (safeLocation == null) {
                     new BukkitRunnable() {
@@ -127,7 +154,10 @@ public class RTPManager {
                         safeLocation.getChunk().load();
                         player.teleportAsync(safeLocation).thenAccept(success -> {
                             if (success) {
-                                plugin.sendMessage(player, "teleported");
+                                plugin.sendMessage(player, "teleport-success", 
+                                    "%x%", String.valueOf(safeLocation.getBlockX()), 
+                                    "%y%", String.valueOf(safeLocation.getBlockY()), 
+                                    "%z%", String.valueOf(safeLocation.getBlockZ()));
                                 plugin.sendTitle(player);
 
                                 // Эффект на финише (с небольшой задержкой)

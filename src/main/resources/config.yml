@@ -11,6 +11,7 @@ modes:
   near:
     radius: 100
     cooldown: 180
+    min-players: 2 # Минимальное количество игроков на сервере для работы /rtp near
   default:
     radius: 1000
     cooldown: 60
@@ -23,16 +24,19 @@ avoid-water: true
 avoid-lava: true
 avoid-trees: true
 safety-check-radius: 5.0
+min-players-near: 2
 
 messages:
-  no-permission: "&cУ вас нет прав для использования этой команды!"
+  no-permission: "&cУ вас нет прав для использования этого режима!"
   teleporting: "&eПоиск безопасной локации..."
-  teleported: "&aВы были телепортированы в случайное место!"
-  cooldown-active: "&cПодождите {time} секунд перед следующим использованием!"
-  cooldown-reset: "&aКулдаун игрока {player} сброшен!"
+  teleport-success: "&aВы успешно телепортировались на координаты: X: %x% Y: %y% Z: %z%!"
+  cooldown: "&cПодождите %time% сек. перед следующей телепортацией!"
+  reset-success: "&aКулдаун игрока %player% сброшен!"
+  reset-not-found: "&cИгрок не найден!"
+  not-enough-players: "&cНедостаточно игроков на сервере для телепортации к кому-либо!"
   cooldown-reset-target: "&aВаш кулдаун был сброшен администратором!"
   player-not-found: "&cИгрок {player} не найден!"
-  invalid-world: "&cЭтот мир не подходит для RTP!"
+  invalid-world: "&cВы не можете использовать RTP здесь!"
   error: "&cПроизошла ошибка при телепортации!"
   no-safe-location: "&cНе удалось найти безопасное место. Попробуйте позже."
   usage: "&cИспользование: /rtp <near|default|far>"
