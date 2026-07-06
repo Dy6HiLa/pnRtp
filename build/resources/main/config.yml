@@ -1,0 +1,35 @@
+# Настройки pnrtp
+# Настройки режимов (радиус и кулдаун в секундах)
+modes:
+  near:
+    radius: 100
+    cooldown: 180
+  far:
+    radius: 1000
+    cooldown: 30
+  long:
+    radius: 3000
+    cooldown: 60
+worldborder-check: true
+avoid-water: true
+avoid-lava: true
+avoid-trees: true
+safety-check-radius: 5.0
+
+messages:
+  no-permission: "&cУ вас нет прав для использования этого команды!"
+  teleporting: "&eПоиск безопасной локации..."
+  teleported: "&aВы были телепорчены в случайное место!"
+  cooldown-active: "&cПодождите {time} секунд перед следующим использованием!"
+  invalid-world: "&cМир не подходит для RTP!"
+  error: "&cПроизошла ошибка при телепортации!"
+  no-safe-location: "&cНе удалось найти безопасное место. Попробуйте позже."
+  usage: "&cИспользование: /rtp <near|far|long>"
+
+titles:
+  enabled: true
+  up: "&aУспех!"
+  down: "&eВы телепортировались!"
+  fadeIn: 10
+  stay: 40
+  fadeOut: 10

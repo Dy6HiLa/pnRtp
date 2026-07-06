@@ -18,9 +18,13 @@ public class RTPTabCompleter implements TabCompleter {
             if (sender instanceof Player && sender.hasPermission("pnrtp.admin")) {
                 completions.add("reload");
             }
-            if (sender.hasPermission("pnrtp.use")) {
+            if (sender.hasPermission("pnrtp.near")) {
                 completions.add("near");
+            }
+            if (sender.hasPermission("pnrtp.far")) {
                 completions.add("far");
+            }
+            if (sender.hasPermission("pnrtp.long")) {
                 completions.add("long");
             }
         }

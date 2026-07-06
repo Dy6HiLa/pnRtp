@@ -25,17 +25,6 @@ public class RTPCommandExecutor implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        if (!player.hasPermission("pnrtp.use")) {
-            plugin.sendMessage(player, "no-permission");
-            return true;
-        }
-
-        if (rtpManager.isOnCooldown(player)) {
-            long remaining = rtpManager.getRemainingCooldown(player);
-            plugin.sendMessage(player, "cooldown-active", "{time}", String.valueOf(remaining));
-            return true;
-        }
-
         // Админ команда reload
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             if (!player.hasPermission("pnrtp.admin")) {
@@ -58,6 +47,17 @@ public class RTPCommandExecutor implements CommandExecutor {
             }
         } else {
             plugin.sendMessage(player, "usage");
+            return true;
+        }
+
+        if (!player.hasPermission("pnrtp." + mode)) {
+            plugin.sendMessage(player, "no-permission");
+            return true;
+        }
+
+        if (!player.hasPermission("pnrtp.bypass") && rtpManager.isOnCooldown(player)) {
+            long remaining = rtpManager.getRemainingCooldown(player);
+            plugin.sendMessage(player, "cooldown-active", "{time}", String.valueOf(remaining));
             return true;
         }
 
