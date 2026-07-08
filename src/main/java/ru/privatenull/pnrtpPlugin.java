@@ -6,9 +6,21 @@ import ru.privatenull.rtp.RTPListener;
 import ru.privatenull.rtp.RTPManager;
 import ru.privatenull.rtp.RTPTabCompleter;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class pnrtpPlugin extends JavaPlugin {
 
     public static final String SUPPORT_DISCORD = "https://discord.gg/rRbzq6cnc6";
+
+    // Паттерн для &#RRGGBB формата (hex shortcut)
+    private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
+    // Паттерн для &x&R&R&G&G&B&B формата (legacy BungeeCord hex)
+    private static final Pattern LEGACY_HEX_PATTERN = Pattern.compile("&x(&[A-Fa-f0-9]){6}");
 
     private RTPManager rtpManager;
 
@@ -28,24 +40,28 @@ public final class pnrtpPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getLogger().info("pnrtp отключён");
+        getLogger().info("pnRtp отключён");
     }
 
     public void reloadPlugin() {
         reloadConfig();
         rtpManager.reloadConfig();
-        getLogger().info("pnrtp: конфигурация перезагружена.");
+        getLogger().info("pnRtp: конфигурация перезагружена.");
     }
 
     public void sendMessage(org.bukkit.command.CommandSender sender, String path, String... replacements) {
+        String prefix = getConfig().getString("prefix", "&8[&6pnRtp&8] ");
+        
         if (getConfig().isList("messages." + path)) {
             for (String line : getConfig().getStringList("messages." + path)) {
-                sender.sendMessage(colorize(applyReplacements(line, replacements)));
+                Component component = colorize(prefix + applyReplacements(line, replacements));
+                sender.sendMessage(component);
             }
         } else {
             String msg = getConfig().getString("messages." + path);
             if (msg != null && !msg.isEmpty()) {
-                sender.sendMessage(colorize(applyReplacements(msg, replacements)));
+                Component component = colorize(prefix + applyReplacements(msg, replacements));
+                sender.sendMessage(component);
             }
         }
     }
@@ -60,16 +76,116 @@ public final class pnrtpPlugin extends JavaPlugin {
         return text;
     }
 
-    public String colorize(String message) {
+    /**
+     * Конвертирует текст с поддержкой:
+     * 1. &#RRGGBB - hex shortcut (например &#FF5555)
+     * 2. &x&R&R&G&G&B&B - legacy BungeeCord hex
+     * 3. &c, &a, &l и т.д. - стандартные цветовые коды
+     * 4. <#RRGGBB> - MiniMessage-like hex
+     * 
+     * Возвращает Component для Adventure API
+     */
+    public Component colorize(String message) {
+        if (message == null) return Component.empty();
+        
+        // 1) Конвертируем &#RRGGBB -> §x§R§R§G§G§B§B
+        Matcher hexMatcher = HEX_PATTERN.matcher(message);
+        StringBuffer sb = new StringBuffer();
+        while (hexMatcher.find()) {
+            String hex = hexMatcher.group(1);
+            StringBuilder replacement = new StringBuilder("§x");
+            for (char c : hex.toCharArray()) {
+                replacement.append("§").append(c);
+            }
+            hexMatcher.appendReplacement(sb, replacement.toString());
+        }
+        hexMatcher.appendTail(sb);
+        message = sb.toString();
+        
+        // 2) Конвертируем &x&R&R&G&G&B&B -> §x§R§R§G§G§B§B
+        Matcher legacyHexMatcher = LEGACY_HEX_PATTERN.matcher(message);
+        sb = new StringBuffer();
+        while (legacyHexMatcher.find()) {
+            String match = legacyHexMatcher.group();
+            legacyHexMatcher.appendReplacement(sb, match.replace("&", "§"));
+        }
+        legacyHexMatcher.appendTail(sb);
+        message = sb.toString();
+        
+        // 3) Конвертируем <#RRGGBB> -> §x§R§R§G§G§B§B
+        Pattern miniHexPattern = Pattern.compile("<#([A-Fa-f0-9]{6})>");
+        Matcher miniHexMatcher = miniHexPattern.matcher(message);
+        sb = new StringBuffer();
+        while (miniHexMatcher.find()) {
+            String hex = miniHexMatcher.group(1);
+            StringBuilder replacement = new StringBuilder("§x");
+            for (char c : hex.toCharArray()) {
+                replacement.append("§").append(c);
+            }
+            miniHexMatcher.appendReplacement(sb, replacement.toString());
+        }
+        miniHexMatcher.appendTail(sb);
+        message = sb.toString();
+        
+        // 4) Конвертируем обычные &коды -> §коды
+        message = message.replace("&", "§");
+        
+        // Десериализуем через Legacy serializer с поддержкой hex
+        return LegacyComponentSerializer.legacySection().deserialize(message);
+    }
+
+    /**
+     * Colorize для строки (используется в titles)
+     */
+    public String colorizeToString(String message) {
         if (message == null) return "";
-        return message.replace("&", "§");
+        
+        // Конвертируем hex форматы 
+        Matcher hexMatcher = HEX_PATTERN.matcher(message);
+        StringBuffer sb = new StringBuffer();
+        while (hexMatcher.find()) {
+            String hex = hexMatcher.group(1);
+            StringBuilder replacement = new StringBuilder("§x");
+            for (char c : hex.toCharArray()) {
+                replacement.append("§").append(c);
+            }
+            hexMatcher.appendReplacement(sb, replacement.toString());
+        }
+        hexMatcher.appendTail(sb);
+        message = sb.toString();
+        
+        Matcher legacyHexMatcher = LEGACY_HEX_PATTERN.matcher(message);
+        sb = new StringBuffer();
+        while (legacyHexMatcher.find()) {
+            String match = legacyHexMatcher.group();
+            legacyHexMatcher.appendReplacement(sb, match.replace("&", "§"));
+        }
+        legacyHexMatcher.appendTail(sb);
+        message = sb.toString();
+        
+        Pattern miniHexPattern = Pattern.compile("<#([A-Fa-f0-9]{6})>");
+        Matcher miniHexMatcher = miniHexPattern.matcher(message);
+        sb = new StringBuffer();
+        while (miniHexMatcher.find()) {
+            String hex = miniHexMatcher.group(1);
+            StringBuilder replacement = new StringBuilder("§x");
+            for (char c : hex.toCharArray()) {
+                replacement.append("§").append(c);
+            }
+            miniHexMatcher.appendReplacement(sb, replacement.toString());
+        }
+        miniHexMatcher.appendTail(sb);
+        message = sb.toString();
+        
+        message = message.replace("&", "§");
+        return message;
     }
 
     public void sendTitle(org.bukkit.entity.Player player) {
         if (!getConfig().getBoolean("titles.enabled", true)) return;
         
-        String up = colorize(getConfig().getString("titles.up", ""));
-        String down = colorize(getConfig().getString("titles.down", ""));
+        String up = colorizeToString(getConfig().getString("titles.up", ""));
+        String down = colorizeToString(getConfig().getString("titles.down", ""));
         int fadeIn = getConfig().getInt("titles.fadeIn", 10);
         int stay = getConfig().getInt("titles.stay", 40);
         int fadeOut = getConfig().getInt("titles.fadeOut", 10);
@@ -111,7 +227,7 @@ public final class pnrtpPlugin extends JavaPlugin {
 
     private void logStartupMessage() {
         logBanner();
-        getLogger().info("pnrtp v" + getDescription().getVersion() + " включён");
+        getLogger().info("pnRtp v" + getDescription().getVersion() + " включён");
         getLogger().info("Поддержка pnRtp: " + SUPPORT_DISCORD);
     }
 

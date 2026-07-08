@@ -33,7 +33,7 @@ public class RTPCommandExecutor implements CommandExecutor {
                 return true;
             }
             plugin.reloadPlugin();
-            player.sendMessage(plugin.colorize("&aКонфигурация перезагружена!"));
+            player.sendMessage(plugin.colorize("&#55FF55Конфигурация перезагружена!"));
             return true;
         }
 
@@ -45,11 +45,11 @@ public class RTPCommandExecutor implements CommandExecutor {
             }
             Player target = Bukkit.getPlayer(args[1]);
             if (target == null) {
-                plugin.sendMessage(player, "player-not-found", "{player}", args[1]);
+                plugin.sendMessage(player, "player-not-found", "%player%", args[1]);
                 return true;
             }
             rtpManager.resetCooldown(target);
-            plugin.sendMessage(player, "cooldown-reset", "{player}", target.getName());
+            plugin.sendMessage(player, "reset-success", "%player%", target.getName());
             plugin.sendMessage(target, "cooldown-reset-target");
             return true;
         }
@@ -75,7 +75,7 @@ public class RTPCommandExecutor implements CommandExecutor {
 
         if (!player.hasPermission("pnrtp.bypass") && rtpManager.isOnCooldown(player)) {
             long remaining = rtpManager.getRemainingCooldown(player);
-            plugin.sendMessage(player, "cooldown-active", "{time}", String.valueOf(remaining));
+            plugin.sendMessage(player, "cooldown", "%time%", String.valueOf(remaining));
             return true;
         }
 
